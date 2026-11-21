@@ -61,7 +61,8 @@ from the real readout sub.gateway records for that device's own login, and its p
 
 ## Run 2 (2026-11-21): the subs cell
 
-Record: `docs/runs/2026-11-21-run2.json`. The subs cell on 3 replicas over two account cells,
+Record: `docs/runs/2026-11-21-run2.json`. Run it again with `subs-prove <run dir outside the repository>`
+(`cells/subs/src/bin/subs-prove.rs`, built with the workspace); the run dir gets the locks, the test key and `run2.jsonl`. The subs cell on 3 replicas over two account cells,
 each process under `systemd-run --user` with CPUQuota=10%, all stopped at the end. Windows answer bands to a caller
 without `subs:usage`; a submit without a tap answers `NeedsGrant`; the one-use grant for that exact task runs it on the
 account with the most headroom and stores why; a forced limit moves the next task with both reasons; a second account
@@ -78,7 +79,5 @@ window starts and `Queued` exactly 1.
 - The 10-of-30 chain-quota proof ran through a real ce-gate in sub.gateway's tests; the deployed gateway gets it with
   its next install (sub-gateway HANDOFF.md).
 - Real accounts stay scheduler `Off` until the owner turns one on.
-- The run 2 recorder was a shell driver (kept outside the repository: new code here is Rust); it becomes a `prove`
-  subcommand of the subs cell, as the seven-lines examples have.
 
 Licence: Apache-2.0.

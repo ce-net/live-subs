@@ -15,6 +15,11 @@ path = "src/lib.rs"
 name = "subs-cell"
 path = "src/main.rs"
 
+# run 2 as one command (was a shell driver outside the repository)
+[[bin]]
+name = "subs-prove"
+path = "src/bin/subs-prove.rs"
+
 [dependencies]
 ce = { package = "seven", git = "https://github.com/ce-net/seven-lines", rev = "cd1507be6fc0" }
 subs = { path = "../../crates/subs" }
