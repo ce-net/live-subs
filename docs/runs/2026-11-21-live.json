@@ -1,0 +1,49 @@
+{
+  "run": "2026-11-21, live system on one server: two account cells (home = Device, one replica each) under systemd-run --user CPUQuota=10% MemoryMax=128M, stopped at the end",
+  "accounts": {
+    "a": "live: its usage is the real readout sub.gateway records for this device's own login (the percent is not published)",
+    "b": "sim: stands in for a second device the mesh does not have here"
+  },
+  "owner_key": "a fresh demo key made for this run; the passkey tap on the owner's phone is not part of it",
+  "sandbox": "systemd-run --user --wait, CPUQuota=10% MemoryMax=64M; the task text arrives as $TASK. agent.box refused this caller (no agent.box:start grant), and the vendor CLI was not started",
+  "task": "summarise the failing test in repo:shop",
+  "steps": [
+    {
+      "step": "pick",
+      "ms": 7,
+      "account": "b",
+      "why": "b: 0% of the week used, the most headroom; a: (live percent not published)"
+    },
+    {
+      "step": "run without grant",
+      "account": "b",
+      "result": "refused: account:run: this op needs the owner's passkey grant for this exact call"
+    },
+    {
+      "step": "run",
+      "account": "b",
+      "client_ms": 259,
+      "sandbox_ms": 245,
+      "out": "task bytes: 39 / aarch64"
+    },
+    {
+      "step": "forced limit",
+      "account": "b",
+      "limited_for_s": 1800
+    },
+    {
+      "step": "pick",
+      "ms": 5,
+      "account": "a",
+      "why": "a: (live percent not published) of the week used, the most headroom; skipped b: limited for 30 more min"
+    },
+    {
+      "step": "run",
+      "account": "a",
+      "client_ms": 254,
+      "sandbox_ms": 204,
+      "out": "task bytes: 39 / aarch64"
+    }
+  ],
+  "scheduler": "Off: no window was started; the gateway's asks_today for this device was the same before and after the run (2, from other work earlier in the day)"
+}

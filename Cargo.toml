@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = ["crates/subs", "cells/account"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+license = "Apache-2.0"
+authors = ["Leif Rydenfalk"]
+repository = "https://github.com/ce-net/live-subs"
+
+[workspace.dependencies]
+seven = { git = "https://github.com/ce-net/seven-lines", rev = "8dee0cf8d9eb56ace13f057d8bd3324c1e11ba9e" }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[profile.release]
+debug = 0
+

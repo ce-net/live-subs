@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#070807">
+<title>Live subs</title>
+<meta name="description" content="One account cell per device owns that device&#x27;s login. The gateway picks an account for each task by weekly headroom and says why; it moves tasks, never credentials or model traffic. Each run needs the owner&#x27;s one-use grant for that exact task.">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<script>try{var t=localStorage.getItem("ce-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<style>
+  body{margin:0;background:var(--bg,#070807);color:var(--ink,#f2f3ef);font-family:Geist,system-ui,sans-serif}
+  main{max-width:980px;margin:0 auto;padding:56px 16px 80px}
+  header.top{display:flex;justify-content:space-between;align-items:center;max-width:980px;margin:0 auto;padding:16px}
+  .brand{font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+  pre.code{font-family:"JetBrains Mono",monospace;font-size:13px;line-height:1.75;margin:0;padding:18px 18px 18px 0;overflow-x:auto;counter-reset:l}
+  pre.code span{display:block;white-space:pre;counter-increment:l}
+  pre.code span::before{content:counter(l);display:inline-block;width:38px;text-align:right;margin-right:16px;color:var(--faint,#5d625b)}
+  section{margin-top:28px}
+  h2{font-family:Geist,sans-serif;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted,#8a8f87);font-weight:500;margin:0 0 10px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .rows{padding:4px 16px}
+  .rows div{display:flex;justify-content:space-between;gap:16px;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.07);font-size:13px}
+  .rows div:last-child{border-bottom:0}
+  .rows b{font-weight:500}
+  .rows span{font-family:"JetBrains Mono",monospace;font-variant-numeric:tabular-nums;color:var(--muted,#8a8f87);text-align:right;word-break:break-all}
+  .note{font-size:14px;line-height:1.6;color:var(--muted,#8a8f87);max-width:70ch}
+  .ok{color:#9bd16b}.bad{color:#ef4444}
+  table{width:100%;border-collapse:collapse;font-family:"JetBrains Mono",monospace;font-size:12px;font-variant-numeric:tabular-nums}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid rgba(255,255,255,.07)}
+  th{font-family:Geist,sans-serif;font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted,#8a8f87);font-weight:500}
+  .scroll{overflow-x:auto}
+  a{color:var(--acc,#f5a524)}
+  @media (max-width:640px){.stats{grid-template-columns:repeat(2,1fr)}pre.code{font-size:11px}main{padding-top:24px}}
+</style>
+</head>
+<body>
+<header class="top"><span class="brand">ce / live subs</span>
+  <nav class="btns glass"><a class="btn quiet" href="https://github.com/ce-net/live-subs">Source</a>
+  <button class="btn" id="theme" type="button">Light</button></nav></header>
+<main>
+  <div class="crumb">ce / <b>Cells</b> / live subs</div>
+  <h1 class="display over">Several subscriptions, one cell per device.</h1>
+  <p class="note">One account cell per device owns that device&#x27;s login. The gateway picks an account for each task by weekly headroom and says why; it moves tasks, never credentials or model traffic. Each run needs the owner&#x27;s one-use grant for that exact task.</p>
+  <section class="glass ticks"><pre class="code" aria-label="cells/account/src/main.rs"><span>#[ce::cell(name = &quot;account&quot;, version = 1, home = Device, skill = &quot;One subscription login on this device: its usage, and runs of the vendor&#x27;s own CLI.&quot;)]</span><span>#[record(cell = account)] struct Seen { usage: account::Use }</span><span>#[op(cap = &quot;account.read&quot;)] async fn usage(cx: Cx, _q: ()) -&gt; Result&lt;account::Use&gt; {</span><span>    let usage = account::login_usage()?; cx.twin().put(&amp;Seen { usage: usage.clone() }).await?; Ok(usage) }</span><span>#[op(cap = &quot;account.run&quot;, grant = Passkey)] async fn run(cx: Cx, t: account::Task) -&gt; Result&lt;account::Value&gt; {</span><span>    cx.step(&quot;account.run&quot;, || async { account::sandbox_start(&amp;t) }).await }</span></pre></section>
+<section><h2>Recorded run, 2026-11-21</h2><div class="glass rows"><div><b>pick</b><span>b in 7 ms: most weekly headroom</span></div><div><b>run without grant</b><span>refused</span></div><div><b>run with grant</b><span>259 ms at the client, 245 ms in a CPUQuota=10% sandbox</span></div><div><b>forced limit</b><span>b limited for 30 min</span></div><div><b>move</b><span>a picked in 5 ms: skipped b, limited for 30 more min</span></div><div><b>run on a</b><span>254 ms</span></div><div><b>scheduler</b><span>Off: no window started</span></div></div></section>
+<section><h2>Accounts</h2><div class="glass rows"><div><b>a</b><span>live: the real usage readout for its own device (percent not published)</span></div><div><b>b</b><span>sim: stands in for a second device</span></div></div></section>
+  <section><h2>Not done yet</h2><ul class="note"><li>The run is a stand-in task in a systemd-run sandbox; agent.box refused this caller (no grant) and no vendor CLI ran.</li><li>The owner key was a demo key; the passkey card that signs a grant is not wired.</li><li>subs is a library and CLI, not yet a replicated cell with Submit and SetSchedule; no Tasks card, no T3 Code row.</li></ul></section>
+  <p class="note" style="margin-top:28px">Raw record: <a href="runs/2026-11-21-live.json">2026-11-21-live.json</a>. A live system, stopped after the run. Licence: Apache-2.0.</p>
+</main>
+<script>
+const $ = (id) => document.getElementById(id);
+$("theme").addEventListener("click", () => {
+  const light = document.documentElement.getAttribute("data-theme") !== "light";
+  if (light) document.documentElement.setAttribute("data-theme", "light"); else document.documentElement.removeAttribute("data-theme");
+  $("theme").textContent = light ? "Dark" : "Light";
+  try { localStorage.setItem("ce-theme", light ? "light" : ""); } catch (e) {}
+});
+</script>
+</body>
+</html>

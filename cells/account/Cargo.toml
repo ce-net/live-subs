@@ -1,0 +1,16 @@
+[package]
+name = "account"
+description = "One subscription login on one device: its usage, and runs of the vendor's own CLI in a sandbox, each with the owner's passkey grant"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[dependencies]
+ce = { package = "seven", git = "https://github.com/ce-net/seven-lines", rev = "8dee0cf8d9eb56ace13f057d8bd3324c1e11ba9e" }
+subs = { path = "../../crates/subs" }
+serde_json.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
