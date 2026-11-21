@@ -1,14 +1,14 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#070807">
+<meta name="theme-color" content="#f6f6f3">
 <title>Live subs</title>
 <meta name="description" content="One account cell per device owns that device&#x27;s login. The gateway picks an account for each task by weekly headroom and says why; it moves tasks, never credentials or model traffic. Each run needs the owner&#x27;s one-use grant for that exact task.">
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="components.css">
-<script>try{var t=localStorage.getItem("ce-theme");if(t)document.documentElement.setAttribute("data-theme",t)}catch(e){}</script>
+<script>try{if(localStorage.getItem("ce-theme")==="dark")document.documentElement.removeAttribute("data-theme")}catch(e){}</script>
 <style>
   body{margin:0;background:var(--bg,#070807);color:var(--ink,#f2f3ef);font-family:Geist,system-ui,sans-serif}
   main{max-width:980px;margin:0 auto;padding:56px 16px 80px}
@@ -38,24 +38,36 @@
 <body>
 <header class="top"><span class="brand">ce / live subs</span>
   <nav class="btns glass"><a class="btn quiet" href="https://github.com/ce-net/live-subs">Source</a>
-  <button class="btn" id="theme" type="button">Light</button></nav></header>
+  <button class="btn" id="theme" type="button">Dark</button></nav></header>
 <main>
   <div class="crumb">ce / <b>Cells</b> / live subs</div>
   <h1 class="display over">Several subscriptions, one cell per device.</h1>
   <p class="note">One account cell per device owns that device&#x27;s login. The gateway picks an account for each task by weekly headroom and says why; it moves tasks, never credentials or model traffic. Each run needs the owner&#x27;s one-use grant for that exact task.</p>
-  <section class="glass ticks"><pre class="code" aria-label="cells/account/src/main.rs"><span>#[ce::cell(name = &quot;account&quot;, version = 1, home = Device, skill = &quot;One subscription login on this device: its usage, and runs of the vendor&#x27;s own CLI.&quot;)]</span><span>#[record(cell = account)] struct Seen { usage: account::Use }</span><span>#[op(cap = &quot;account.read&quot;)] async fn usage(cx: Cx, _q: ()) -&gt; Result&lt;account::Use&gt; {</span><span>    let usage = account::login_usage()?; cx.twin().put(&amp;Seen { usage: usage.clone() }).await?; Ok(usage) }</span><span>#[op(cap = &quot;account.run&quot;, grant = Passkey)] async fn run(cx: Cx, t: account::Task) -&gt; Result&lt;account::Value&gt; {</span><span>    cx.step(&quot;account.run&quot;, || async { account::sandbox_start(&amp;t) }).await }</span></pre></section>
+  <section class="glass ticks"><pre class="code" aria-label="cells/account/src/main.rs"><span>#[ce::cell(name = &quot;account&quot;, version = 1, home = Device, skill = &quot;One subscription login on this device: its usage, and runs of the vendor&#x27;s own CLI.&quot;)]</span><span>#[record(cell = account)] struct Seen { usage: account::Use }</span><span>#[record(cell = account)] struct Started { day: u64, result: account::Value }</span><span>#[op(cap = &quot;account.read&quot;)] async fn usage(cx: Cx, _q: ()) -&gt; Result&lt;account::Use&gt; {</span><span>    let usage = account::login_usage()?; cx.twin().put(&amp;Seen { usage: usage.clone() }).await?; Ok(usage) }</span><span>#[op(cap = &quot;account.run&quot;, grant = Passkey)] async fn run(cx: Cx, t: account::Task) -&gt; Result&lt;account::Value&gt; {</span><span>    cx.step(&quot;account.run&quot;, || async { account::sandbox_start(&amp;t) }).await }</span><span>#[op(cap = &quot;account.window&quot;)] async fn window_start(cx: Cx, _q: ()) -&gt; Result&lt;account::Value&gt; {</span><span>    let (u, day) = (account::login_usage()?, account::today()); let n = cx.twin().all::&lt;Started&gt;().iter().filter(|(_, s)| s.day == day).count() as u32;</span><span>    let result = cx.step(&quot;account.window&quot;, || async { account::window_start(&amp;u, n) }).await?; cx.twin().put(&amp;Started { day, result: result.clone() }).await?; Ok(result) }</span></pre></section>
 <section><h2>Recorded run, 2026-11-21</h2><div class="glass rows"><div><b>pick</b><span>b in 7 ms: most weekly headroom</span></div><div><b>run without grant</b><span>refused</span></div><div><b>run with grant</b><span>259 ms at the client, 245 ms in a CPUQuota=10% sandbox</span></div><div><b>forced limit</b><span>b limited for 30 min</span></div><div><b>move</b><span>a picked in 5 ms: skipped b, limited for 30 more min</span></div><div><b>run on a</b><span>254 ms</span></div><div><b>scheduler</b><span>Off: no window started</span></div></div></section>
+<section><h2>Run 2, 2026-11-21: the subs cell</h2><div class="glass rows">
+<div><b>windows (no subs:usage)</b><span>bands only: a: low, b: mid</span></div>
+<div><b>submit without a tap</b><span>NeedsGrant: caller, input hash, summary</span></div>
+<div><b>tap</b><span>one-use grant for that exact task in 11 ms</span></div>
+<div><b>submit with the grant</b><span>a picked (most headroom), ran in the capped sandbox, 550 ms</span></div>
+<div><b>forced limit on a</b><span>a answered Limited; picked again: b, both reasons stored</span></div>
+<div><b>second account on one device</b><span>refused: one account per device</span></div>
+<div><b>Claude on a device row without it</b><span>NotOnThisDevice</span></div>
+<div><b>scheduler Off</b><span>0 window starts</span></div>
+<div><b>scheduler Queued, one task waiting</b><span>exactly 1 start</span></div>
+</div><p class="note">Three subs replicas and three account cells, each under systemd-run with CPUQuota=10%, stopped at the end. Accounts are sim; a fresh test key signed the grant. Record: <a href="runs/2026-11-21-run2.json">2026-11-21-run2.json</a>.</p></section>
 <section><h2>Accounts</h2><div class="glass rows"><div><b>a</b><span>live: the real usage readout for its own device (percent not published)</span></div><div><b>b</b><span>sim: stands in for a second device</span></div></div></section>
-  <section><h2>Not done yet</h2><ul class="note"><li>The run is a stand-in task in a systemd-run sandbox; agent.box refused this caller (no grant) and no vendor CLI ran.</li><li>The owner key was a demo key; the passkey card that signs a grant is not wired.</li><li>subs is a library and CLI, not yet a replicated cell with Submit and SetSchedule; no Tasks card, no T3 Code row.</li></ul></section>
+  <section><h2>Not done yet</h2><ul class="note"><li>Runs use a stand-in task in a systemd-run sandbox; agent.box Start under the account's ai.account lease is wired as a command (ACCOUNT_LEASE_CMD) but the account cell holds no agent.box:start grant yet, so no vendor CLI ran.</li><li>The second device is sim: run 2 ran on one server.</li><li>The phone card that answers NeedsGrant is not wired; a test key signed the grant.</li><li>No Tasks card in the control room yet, and no T3 Code instance behind wrap.auth yet (its catalog entry lints).</li><li>The 10-of-30 chain-quota proof ran through a real gate in sub.gateway's tests; the deployed gateway gets it with the next install.</li></ul></section>
   <p class="note" style="margin-top:28px">Raw record: <a href="runs/2026-11-21-live.json">2026-11-21-live.json</a>. A live system, stopped after the run. Licence: Apache-2.0.</p>
 </main>
 <script>
 const $ = (id) => document.getElementById(id);
+$("theme").textContent = document.documentElement.getAttribute("data-theme") === "light" ? "Dark" : "Light";
 $("theme").addEventListener("click", () => {
   const light = document.documentElement.getAttribute("data-theme") !== "light";
   if (light) document.documentElement.setAttribute("data-theme", "light"); else document.documentElement.removeAttribute("data-theme");
   $("theme").textContent = light ? "Dark" : "Light";
-  try { localStorage.setItem("ce-theme", light ? "light" : ""); } catch (e) {}
+  try { localStorage.setItem("ce-theme", light ? "light" : "dark"); } catch (e) {}
 });
 </script>
 </body>

@@ -59,15 +59,26 @@ from the real readout sub.gateway records for that device's own login, and its p
 | move | the next pick took `a` in 5 ms: "skipped b: limited for 30 more min". Its run took 254 ms |
 | scheduler | `Off`. The gateway's ask count for the device was the same before and after |
 
+## Run 2 (2026-11-21): the subs cell
+
+Record: `docs/runs/2026-11-21-run2.json`. The subs cell on 3 replicas over two account cells,
+each process under `systemd-run --user` with CPUQuota=10%, all stopped at the end. Windows answer bands to a caller
+without `subs:usage`; a submit without a tap answers `NeedsGrant`; the one-use grant for that exact task runs it on the
+account with the most headroom and stores why; a forced limit moves the next task with both reasons; a second account
+on one device is refused; Claude on a device row that does not list it is `NotOnThisDevice`; scheduler `Off` makes 0
+window starts and `Queued` exactly 1.
+
 ## Not done yet
 
-- The run is a stand-in task in a `systemd-run` sandbox. agent.box refused this caller because it has no
-  `agent.box:start` grant, and no vendor CLI was started.
-- The owner key was a demo key made for the run. The passkey card on the owner's phone that signs a grant is not
-  wired up yet.
-- `subs` is a library and a CLI (`subs windows | pick`), not yet a replicated cell with `Submit` and `SetSchedule`
-  ops. There is no Tasks card in the control room and no T3 Code wrap spec or health row.
-- `cx.login().usage()` per vendor: slice 1 reads the window line sub.gateway already records.
-- The second device is sim. The second node's install grant is not verified.
+- Runs use a stand-in task in a `systemd-run` sandbox. `run` asks `ai.account Lease` first (`ACCOUNT_LEASE_CMD`), but
+  the account cell holds no `agent.box:start` grant yet, so no vendor CLI ran.
+- The second device is sim: run 2 ran on one server.
+- The card on the owner's phone that answers a `NeedsGrant` is not wired; a fresh test key signed the grants.
+- No Tasks card in the control room yet; T3 Code has a catalog entry (ce-net/wrap) but no instance behind wrap.auth.
+- The 10-of-30 chain-quota proof ran through a real ce-gate in sub.gateway's tests; the deployed gateway gets it with
+  its next install (sub-gateway HANDOFF.md).
+- Real accounts stay scheduler `Off` until the owner turns one on.
+- The run 2 recorder was a shell driver (kept outside the repository: new code here is Rust); it becomes a `prove`
+  subcommand of the subs cell, as the seven-lines examples have.
 
 Licence: Apache-2.0.

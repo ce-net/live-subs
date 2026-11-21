@@ -1,0 +1,283 @@
+{
+ "run": "2026-11-21 run 2, live system on one server: the subs cell (3 replicas) over two account cells (home = Device), every process under systemd-run --user CPUQuota=10% MemoryMax=128M, stopped at the end",
+ "accounts": {
+  "a": "sim, on this device",
+  "b": "sim, stands in for a second device the mesh does not have here"
+ },
+ "key": "a fresh scoped test key made for this run signs the one-use grant (it stands in for the owner's device key); no owner session was used",
+ "published": "labels a and b, bands and timings only: no account name, login, address or usage percent",
+ "steps": [
+  {
+   "step": "start",
+   "at": 1795258050,
+   "replicas": 3,
+   "accounts": {
+    "a": "sim, this device",
+    "b": "sim, a second device the mesh does not have here"
+   }
+  },
+  {
+   "step": "windows",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": [
+      {
+       "band": "Low",
+       "device": null,
+       "label": "a",
+       "limited": false,
+       "ok": true,
+       "sim": true,
+       "vendor": "claude",
+       "week_pct": null,
+       "window_ends": null
+      },
+      {
+       "band": "Mid",
+       "device": null,
+       "label": "b",
+       "limited": false,
+       "ok": true,
+       "sim": true,
+       "vendor": "claude",
+       "week_pct": null,
+       "window_ends": null
+      }
+     ],
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   }
+  },
+  {
+   "step": "submit_without_tap",
+   "reply": {
+    "NeedsGrant": {
+     "caller": "c9571eeb4aa9",
+     "cell": "subs",
+     "input_hash": "e37721f59023",
+     "op": "submit",
+     "summary": "key c9571eeb4aa9 asks to run subs.submit once with {\"text\":\"summarise the failing test in repo:shop\"}; this op needs the owner's passkey grant for this exact call"
+    }
+   }
+  },
+  {
+   "step": "tap",
+   "ms": 11,
+   "signed_by": "the test key (stands in for the owner's device key)"
+  },
+  {
+   "step": "submit_with_grant",
+   "ms": 550,
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": {
+      "account": "a",
+      "id": "t1",
+      "repo": null,
+      "result": {
+       "reply": {
+        "ok": true,
+        "out": {
+         "exit": 0,
+         "leased": false,
+         "ms": 94,
+         "out_tail": "task bytes: 39\naarch64",
+         "sim": false
+        },
+        "replayed": false,
+        "resumed_steps": 0
+       }
+      },
+      "state": "Done",
+      "text": "summarise the failing test in repo:shop",
+      "why": "a: low use this week, the most headroom; b: mid use this week"
+     },
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   }
+  },
+  {
+   "step": "forced_limit",
+   "account": "a"
+  },
+  {
+   "step": "submit_after_limit",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": {
+      "account": "b",
+      "id": "t2",
+      "repo": null,
+      "result": {
+       "reply": {
+        "ok": true,
+        "out": {
+         "exit": 0,
+         "leased": false,
+         "ms": 104,
+         "out_tail": "task bytes: 31\naarch64",
+         "sim": false
+        },
+        "replayed": false,
+        "resumed_steps": 0
+       }
+      },
+      "state": "Done",
+      "text": "open a pull request for the fix",
+      "why": "a: low use this week, the most headroom; b: mid use this week; a answered Limited; picked again: b: mid use this week, the most headroom; skipped a: limited for 60 more min"
+     },
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   }
+  },
+  {
+   "step": "second_account_same_device",
+   "reply": "refused: d already has a claude account (a): one account per device"
+  },
+  {
+   "step": "claude_on_a_device_row_without_it",
+   "reply": {
+    "Denied": "NotOnThisDevice: this device lists [\"gemini\"], not claude"
+   }
+  },
+  {
+   "step": "plan_off",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": {
+      "account": "a",
+      "ceiling_pct": 85,
+      "schedule": "Off",
+      "starts_per_day": 1
+     },
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   }
+  },
+  {
+   "step": "tick_off",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": [],
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   },
+   "starts": 0
+  },
+  {
+   "step": "plan_queued",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": {
+      "account": "a",
+      "ceiling_pct": 85,
+      "schedule": "Queued",
+      "starts_per_day": 1
+     },
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   }
+  },
+  {
+   "step": "tick_queued",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": [
+      {
+       "account": "a",
+       "result": {
+        "started": true
+       },
+       "why": "Queued: a start is due"
+      }
+     ],
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   },
+   "starts": 1
+  },
+  {
+   "step": "tasks_own",
+   "reply": {
+    "reply": {
+     "ok": true,
+     "out": [
+      {
+       "account": "a",
+       "id": "t1",
+       "repo": null,
+       "result": {
+        "reply": {
+         "ok": true,
+         "out": {
+          "exit": 0,
+          "leased": false,
+          "ms": 94,
+          "out_tail": "task bytes: 39\naarch64",
+          "sim": false
+         },
+         "replayed": false,
+         "resumed_steps": 0
+        }
+       },
+       "state": "Done",
+       "text": "summarise the failing test in repo:shop",
+       "why": "a: low use this week, the most headroom; b: mid use this week"
+      },
+      {
+       "account": "b",
+       "id": "t2",
+       "repo": null,
+       "result": {
+        "reply": {
+         "ok": true,
+         "out": {
+          "exit": 0,
+          "leased": false,
+          "ms": 104,
+          "out_tail": "task bytes: 31\naarch64",
+          "sim": false
+         },
+         "replayed": false,
+         "resumed_steps": 0
+        }
+       },
+       "state": "Done",
+       "text": "open a pull request for the fix",
+       "why": "a: low use this week, the most headroom; b: mid use this week; a answered Limited; picked again: b: mid use this week, the most headroom; skipped a: limited for 60 more min"
+      },
+      {
+       "account": null,
+       "id": "t3",
+       "repo": null,
+       "result": null,
+       "state": "Waiting",
+       "text": "a task no account serves",
+       "why": "no gemini account"
+      }
+     ],
+     "replayed": false,
+     "resumed_steps": 0
+    }
+   }
+  },
+  {
+   "step": "end",
+   "at": 1795258051
+  }
+ ]
+}
