@@ -1,0 +1,25 @@
+[package]
+name = "subs-cell"
+description = "The subs cell: pick an account for a task and say why; tasks filtered at the server, usage as bands for callers without subs.usage, the schedule Off by default"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+
+[lib]
+name = "live"
+path = "src/lib.rs"
+
+[[bin]]
+name = "subs-cell"
+path = "src/main.rs"
+
+[dependencies]
+ce = { package = "seven", git = "https://github.com/ce-net/seven-lines", rev = "cd1507be6fc0" }
+subs = { path = "../../crates/subs" }
+serde.workspace = true
+serde_json.workspace = true
+
+[dev-dependencies]
+serde_json.workspace = true
